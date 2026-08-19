@@ -1,8 +1,8 @@
-import { useFavorites } from '../context/FavoritesContext'
+import { useSelector } from 'react-redux'
 import MovieCard from '../components/MovieCard'
 
 function Favorites() {
-  const { favorites } = useFavorites()
+  const favorites = useSelector((state) => state.favorites)
 
   if (favorites.length === 0) {
     return <p className="p-6 text-gray-400 text-lg">Henüz favori film eklemedin.</p>

@@ -14,6 +14,9 @@ function Navbar() {
           <Link to="/favorites" className="hover:text-red-400 transition font-medium">
             Favorilerim
           </Link>
+          <Link to="/login" className="hover:text-red-400 transition font-medium">
+            Giriş Yap
+          </Link>
         </div>
       </div>
     </nav>

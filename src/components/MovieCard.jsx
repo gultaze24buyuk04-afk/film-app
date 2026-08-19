@@ -1,17 +1,28 @@
-import { Link } from 'react-router-dom'
-import { useFavorites } from '../context/FavoritesContext'
+import { Link, useNavigate } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { addFavorite, removeFavorite } from '../redux/favoritesSlice'
 
 function MovieCard({ movie }) {
-  const { addFavorite, removeFavorite, isFavorite } = useFavorites()
-  const favorited = isFavorite(movie.id)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const favorites = useSelector((state) => state.favorites)
+  const sessionId = useSelector((state) => state.auth.sessionId)
+  const favorited = favorites.some((m) => m.id === movie.id)
 
   const handleFavoriteClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
+
+    if (!sessionId) {
+      alert('Favorilere eklemek için önce giriş yapmalısın.')
+      navigate('/login')
+      return
+    }
+
     if (favorited) {
-      removeFavorite(movie.id)
+      dispatch(removeFavorite(movie.id))
     } else {
-      addFavorite(movie)
+      dispatch(addFavorite(movie))
     }
   }
 

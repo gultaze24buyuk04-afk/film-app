@@ -3,6 +3,7 @@ import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import Favorites from './pages/Favorites'
 import MovieDetails from './pages/MovieDetails'
+import Login from './pages/Login'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/favorites" element={<Favorites />} />
         <Route path="/movie/:id" element={<MovieDetails />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </div>
   )

@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
 import { getMovieDetails } from '../services/movieApi'
-import { useFavorites } from '../context/FavoritesContext'
+import { addFavorite, removeFavorite } from '../redux/favoritesSlice'
 
 function MovieDetails() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [movie, setMovie] = useState(null)
-  const { addFavorite, removeFavorite, isFavorite } = useFavorites()
+  const dispatch = useDispatch()
+  const favorites = useSelector((state) => state.favorites)
+  const sessionId = useSelector((state) => state.auth.sessionId)
 
   useEffect(() => {
     getMovieDetails(id).then((data) => setMovie(data))
@@ -16,13 +20,19 @@ function MovieDetails() {
     return <p className="p-6">Yükleniyor...</p>
   }
 
-  const favorited = isFavorite(movie.id)
+  const favorited = favorites.some((m) => m.id === movie.id)
 
   const handleFavoriteClick = () => {
+    if (!sessionId) {
+      alert('Favorilere eklemek için önce giriş yapmalısın.')
+      navigate('/login')
+      return
+    }
+
     if (favorited) {
-      removeFavorite(movie.id)
+      dispatch(removeFavorite(movie.id))
     } else {
-      addFavorite(movie)
+      dispatch(addFavorite(movie))
     }
   }
 
