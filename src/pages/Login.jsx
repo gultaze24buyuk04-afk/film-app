@@ -1,14 +1,14 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { createRequestToken } from '../services/movieApi'
-import { setSession, logout } from '../redux/authSlice'
+import { createRequestToken, createSession, getAccountDetails } from '../services/movieApi'
+import { setSession, setAccount, logout } from '../redux/authSlice'
 import { useEffect } from 'react'
-import { createSession } from '../services/movieApi'
 
 function Login() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const sessionId = useSelector((state) => state.auth.sessionId)
+  const account = useSelector((state) => state.auth.account)
 
   const handleLogin = async () => {
     const requestToken = await createRequestToken()
@@ -22,6 +22,10 @@ function Login() {
     const finishLogin = async () => {
       const newSessionId = await createSession(approvedToken)
       dispatch(setSession(newSessionId))
+
+      const accountData = await getAccountDetails(newSessionId)
+      dispatch(setAccount(accountData))
+
       localStorage.removeItem('pending_request_token')
       navigate('/')
     }
@@ -39,6 +43,11 @@ function Login() {
     return (
       <div className="p-6 max-w-md mx-auto text-center">
         <h2 className="text-2xl font-bold mb-4 text-white">Giriş Yapıldı ✅</h2>
+        {account && (
+          <p className="text-gray-400 mb-4">
+            Kullanıcı adı: {account.username}
+          </p>
+        )}
         <button
           onClick={handleLogout}
           className="px-5 py-2.5 bg-red-600 hover:bg-red-700 rounded-lg font-semibold transition"

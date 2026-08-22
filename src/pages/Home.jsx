@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react'
-import { getPopularMovies, searchMovies } from '../services/movieApi'
+import { useSelector } from 'react-redux'
+import { useLocation } from 'react-router-dom'
+import { getPopularMovies, searchMovies, getFavoriteMovies } from '../services/movieApi'
 import MovieCard from '../components/MovieCard'
 import Spinner from '../components/Spinner'
 
 function Home() {
+  const sessionId = useSelector((state) => state.auth.sessionId)
+  const accountId = useSelector((state) => state.auth.account?.id)
+  const location = useLocation()
   const [movies, setMovies] = useState([])
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
+  const [favoriteIds, setFavoriteIds] = useState([])
 
   useEffect(() => {
     setLoading(true)
@@ -15,6 +21,14 @@ function Home() {
       setLoading(false)
     })
   }, [])
+
+  useEffect(() => {
+    if (accountId && sessionId) {
+      getFavoriteMovies(accountId, sessionId).then((data) => {
+        setFavoriteIds(data.map((movie) => movie.id))
+      })
+    }
+  }, [accountId, sessionId, location.key])
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -59,7 +73,11 @@ function Home() {
       ) : (
         <div className="flex flex-wrap gap-4">
           {movies.map((movie) => (
-            <MovieCard key={movie.id} movie={movie} />
+            <MovieCard
+              key={movie.id}
+              movie={movie}
+              isFavorited={favoriteIds.includes(movie.id)}
+            />
           ))}
         </div>
       )}

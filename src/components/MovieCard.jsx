@@ -1,15 +1,19 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
-import { addFavorite, removeFavorite } from '../redux/favoritesSlice'
+import { useSelector } from 'react-redux'
+import { toggleFavorite } from '../services/movieApi'
+import { useState, useEffect } from 'react'
 
-function MovieCard({ movie }) {
-  const dispatch = useDispatch()
+function MovieCard({ movie, isFavorited = false, onFavoriteChange }) {
   const navigate = useNavigate()
-  const favorites = useSelector((state) => state.favorites)
   const sessionId = useSelector((state) => state.auth.sessionId)
-  const favorited = favorites.some((m) => m.id === movie.id)
+  const accountId = useSelector((state) => state.auth.account?.id)
+  const [favorited, setFavorited] = useState(isFavorited)
 
-  const handleFavoriteClick = (e) => {
+  useEffect(() => {
+    setFavorited(isFavorited)
+  }, [isFavorited])
+
+  const handleFavoriteClick = async (e) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -19,10 +23,12 @@ function MovieCard({ movie }) {
       return
     }
 
-    if (favorited) {
-      dispatch(removeFavorite(movie.id))
-    } else {
-      dispatch(addFavorite(movie))
+    const newStatus = !favorited
+    await toggleFavorite(accountId, sessionId, movie.id, newStatus)
+    setFavorited(newStatus)
+
+    if (onFavoriteChange) {
+      onFavoriteChange()
     }
   }
 

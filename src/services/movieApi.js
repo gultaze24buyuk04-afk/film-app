@@ -68,3 +68,52 @@ export const createSession = async (requestToken) => {
   const data = await response.json();
   return data.session_id;
 };
+// Hesap bilgilerini getir (session_id ile)
+export const getAccountDetails = async (sessionId) => {
+  const response = await fetch(
+    `${BASE_URL}/account?session_id=${sessionId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${READ_TOKEN}`,
+        accept: "application/json"
+      }
+    }
+  );
+  const data = await response.json();
+  return data;
+};
+// Favoriye ekle veya çıkar
+export const toggleFavorite = async (accountId, sessionId, movieId, favoriteStatus) => {
+  const response = await fetch(
+    `${BASE_URL}/account/${accountId}/favorite?session_id=${sessionId}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${READ_TOKEN}`,
+        accept: "application/json",
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        media_type: "movie",
+        media_id: movieId,
+        favorite: favoriteStatus
+      })
+    }
+  );
+  const data = await response.json();
+  return data;
+};
+// Favori filmleri TMDB'den getir
+export const getFavoriteMovies = async (accountId, sessionId) => {
+  const response = await fetch(
+    `${BASE_URL}/account/${accountId}/favorite/movies?session_id=${sessionId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${READ_TOKEN}`,
+        accept: "application/json"
+      }
+    }
+  );
+  const data = await response.json();
+  return data.results;
+};
